@@ -9,6 +9,7 @@ import type {
   VerificationToken,
 } from "next-auth/adapters"
 import type { MongoClient } from "mongodb"
+import type { Connection } from "mongoose"
 
 export interface MongoDBAdapterOptions {
   collections?: {
@@ -67,14 +68,20 @@ export function _id(hex?: string) {
 }
 
 export function MongoDBAdapter(
-  client: Promise<MongoClient>,
+  client: Promise<MongoClient> | Promise<Connection>,
   options: MongoDBAdapterOptions = {}
 ): Adapter {
   const { collections } = options
   const { from, to } = format
 
   const db = (async () => {
-    const _db = (await client).db(options.databaseName)
+    const _client = await client
+    let _db
+    if ("id" in _client) {
+      _db = (await client).getClient().db(options.databaseName)
+    } else {
+      _db = (await client).db(options.databaseName)
+    }
     const c = { ...defaultCollections, ...collections }
     return {
       U: _db.collection<AdapterUser>(c.Users),

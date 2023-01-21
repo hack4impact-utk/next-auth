@@ -39,6 +39,7 @@
     "@next-auth/tsconfig": "workspace:*",
     "jest": "^27.4.3",
     "mongodb": "^4.4.0",
+    "mongoose": "^6.8.0",
     "next-auth": "workspace:*"
   },
   "jest": {
